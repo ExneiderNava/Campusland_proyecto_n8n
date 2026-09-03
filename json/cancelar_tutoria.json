@@ -259,7 +259,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        976,
+        1696,
         448
       ],
       "id": "7805340b-884e-483a-a807-719550f29cad",
@@ -346,8 +346,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1200,
-        448
+        1888,
+        416
       ],
       "id": "ee759d58-4660-44b2-ac53-9179c760d79b",
       "name": "Append or update row in sheet",
@@ -367,8 +367,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1424,
-        448
+        2080,
+        432
       ],
       "id": "232ef8f7-b8e9-4b9e-8d5a-2fbd8f6b02a0",
       "name": "Send a text message1",
@@ -422,8 +422,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        1440,
-        272
+        1504,
+        240
       ],
       "id": "b9850372-eeb2-45ae-a072-c349a016b3db",
       "name": "Send a text message2",
@@ -563,6 +563,270 @@
           "name": "Google Sheets account"
         }
       }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3ae9dec6-9773-4817-bb76-67701d6f6c20",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.Texto }}",
+              "rightValue": "0",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        912,
+        480
+      ],
+      "id": "8725f238-3420-4be5-be0e-47759d7aebe9",
+      "name": "¿Es Cero?"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1767426209,
+          "mode": "list",
+          "cachedResultName": "secciones",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=1767426209"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "usuario_telegram": "={{ $('When Executed by Another Workflow').item.json.id_usuario }}",
+            "pantalla_actual": "reinicio",
+            "paso_actual": "\"\"",
+            "datos_parciales": "\"\""
+          },
+          "matchingColumns": [
+            "usuario_telegram"
+          ],
+          "schema": [
+            {
+              "id": "usuario_telegram",
+              "displayName": "usuario_telegram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "pantalla_actual",
+              "displayName": "pantalla_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paso_actual",
+              "displayName": "paso_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "datos_parciales",
+              "displayName": "datos_parciales",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1120,
+        384
+      ],
+      "id": "d02594a7-dd51-4c47-8e05-f3162691138a",
+      "name": "Resetear Sesión a Menú",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.id_usuario }}",
+        "text": "❌ Cancelación anulada.\n\nHe cancelado el proceso de baja.\nTu sesión ha sido restablecida. \n\nEscríbeme cualquier cosa en cualquier momento para volver a desplegar el menú principal. 🤖",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1312,
+        384
+      ],
+      "id": "ad3695cf-6af5-4a13-809b-b55a3f40fae4",
+      "name": "Notificar Cancelación Anulada",
+      "webhookId": "158b83c5-4bbb-454c-8f85-898334fbd991",
+      "credentials": {
+        "telegramApi": {
+          "id": "2Fyqyxu7Bxb6E0DW",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 386476655,
+          "mode": "list",
+          "cachedResultName": "tutorias",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=386476655"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "id_estudiante",
+              "lookupValue": "={{ $('When Executed by Another Workflow').item.json.id_usuario }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1120,
+        592
+      ],
+      "id": "1402b4e9-1e15-4764-8810-d07aae8434ea",
+      "name": "Leer Tutorías Confirmar",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Capturamos los datos\nconst tutorias = $input.all();\nconst triggerData = $(\"When Executed by Another Workflow\").first().json;\nconst codigoIngresado = triggerData.Texto.toUpperCase().trim();\nconst idUsuario = triggerData.id_usuario;\n\n// 2. Filtramos únicamente las tutorías activas asignadas a este estudiante\nconst activas = tutorias.filter(t => \n  t.json.id_estudiante && t.json.id_estudiante.toString() === idUsuario.toString() && t.json.estado === \"Asignada\"\n);\n\n// 3. Comprobamos si el código escrito por el usuario existe en sus tutorías activas\nconst existeCodigo = activas.some(t => t.json.id_tutoria && t.json.id_tutoria.toUpperCase().trim() === codigoIngresado);\n\n// 4. Retornamos el resultado de la validación\nreturn [{\n  json: {\n    id_usuario: idUsuario,\n    codigo_ingresado: codigoIngresado,\n    es_valido: existeCodigo\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        608
+      ],
+      "id": "32a61773-6616-4590-9afc-a4043d222a73",
+      "name": "Validar Código Ingresado"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d2c89fab-25bc-4d42-944b-c887183214b6",
+              "leftValue": "={{ $json.es_valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1488,
+        592
+      ],
+      "id": "c3dd97bc-592c-424d-bf2e-77b2ed95fe93",
+      "name": "¿Código es Válido?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('When Executed by Another Workflow').item.json.id_usuario }}",
+        "text": "⚠️ Código no encontrado o inválido.\nNo tienes ninguna tutoría activa agendada con el código que ingresaste. \nPor favor: \n1. Revisa el listado de tutorías programadas que te envié arriba.\n2. Escribe el código exacto de referencia (ej: `TUT-9861`). \n👉 *O si deseas salir, escribe \"0\" para cancelar esta acción y volver al menú principal.*",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1680,
+        656
+      ],
+      "id": "8ea1ea0a-bc02-4356-943a-90adbd2b1284",
+      "name": "Notificar Código Inválido",
+      "webhookId": "cfe38666-8423-499b-a2ef-59859fe2ccc7",
+      "credentials": {
+        "telegramApi": {
+          "id": "2Fyqyxu7Bxb6E0DW",
+          "name": "Telegram account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -600,7 +864,7 @@
         ],
         [
           {
-            "node": "Update row in sheet",
+            "node": "¿Es Cero?",
             "type": "main",
             "index": 0
           }
@@ -679,6 +943,75 @@
           }
         ]
       ]
+    },
+    "¿Es Cero?": {
+      "main": [
+        [
+          {
+            "node": "Resetear Sesión a Menú",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Leer Tutorías Confirmar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resetear Sesión a Menú": {
+      "main": [
+        [
+          {
+            "node": "Notificar Cancelación Anulada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer Tutorías Confirmar": {
+      "main": [
+        [
+          {
+            "node": "Validar Código Ingresado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar Código Ingresado": {
+      "main": [
+        [
+          {
+            "node": "¿Código es Válido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Código es Válido?": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notificar Código Inválido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -686,7 +1019,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "6f13ceb2-9e4b-4da0-9e64-82ee2a8f6924",
+  "versionId": "748cf351-958c-4130-8570-77227e6c94f1",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "6fcfdf5ede3d3e02de551675bbb314bed1edccb2ee146222cbfaf7e8945a954f"
