@@ -1,6 +1,16 @@
 # TutorBot 🤖 - Sistema de Asesorías Académicas Automatizado
 
+**Solución optimizada presentada por: Exneider Nava**
+
 Bienvenidos al repositorio oficial de **TutorBot**, una solución integral de automatización para la gestión y asignación inteligente de tutorías académicas. Este proyecto ha sido desarrollado en la plataforma **n8n** utilizando un diseño arquitectónico distribuido, robustas reglas de negocio basadas en JavaScript, y un Agente de Inteligencia Artificial (Gemini) que actúa como asistente conversacional interactivo.
+
+---
+
+## 🚀 ¡Pruébalo ahora en vivo!
+
+Si quieres probar el funcionamiento de este flujo de forma inmediata, puedes interactuar directamente con el bot en Telegram ingresando al siguiente enlace:
+
+👉 [t.me/exneider_bot](https://t.me/exneider_bot)
 
 ---
 
@@ -13,97 +23,29 @@ Tradicionalmente, la coordinación de asesorías académicas en la institución 
 *   Falta absoluta de trazabilidad y estadísticas para la dirección de la institución.
 
 ### La Estrategia 🚀
-**TutorBot** ataca este problema mediante un flujo inteligente y conversacional guiado tipo **Wizard** (asistente paso a paso) que automatiza por completo el registro, agendamiento, consulta y cancelación de tutorías. 
+**TutorBot** ataca este problema mediante un flujo inteligente y conversacional guiado tipo **Wizard** (asistente paso a paso) que automatiza por completo el registro, agendamiento, consulta y cancelación de tutorías.
 *   **Orquestación en n8n:** n8n funciona como el coordinador y cerebro lógico que procesa el estado de sesión de cada usuario, gestiona el emparejamiento tutor-estudiante y despacha las notificaciones automáticas.
 *   **Base de datos centralizada:** Se utiliza Google Sheets como base de datos organizada en pestañas estructuradas para el almacenamiento seguro y persistente de los datos.
 *   **Control Matemático de Conflictos:** Un motor en JavaScript valida colisiones de agenda en tiempo real para eliminar por completo la duplicidad de reservas.
 
 ---
 
-## 📂 2. Estructura de la Base de Datos (`TutorBot_DB`)
+## 📂 2. Estructura de la Base de Datos
 
-El modelo relacional se implementa sobre una hoja de cálculo nativa de Google Sheets. El archivo está compuesto por cinco pestañas estructuradas de la siguiente manera:
+Toda la persistencia de datos de los tutores, el registro de estudiantes, la disponibilidad horaria de cada clase, las tutorías agendadas y el control dinámico de las sesiones en vivo se gestionan a través de una base de datos centralizada en Google Sheets.
 
-### Pestaña: `tutores` 👨‍🏫
-Almacena el listado y estado de los docentes oficiales:
-*   `id_tutor`: Identificador único numérico (ej. `1`).
-*   `nombre`: Nombre completo del profesor (ej. `Javier Cuadros`).
-*   `materia`: Asignatura que imparte (`Software`, `Inglés`, `Ser`).
-*   `estado`: Disponibilidad actual del tutor (`Disponible`).
-
-### Pestaña: `estudiantes` 🎓
-Guarda el registro de los alumnos inscritos formalmente mediante el formulario:
-*   `id_estudiante`: ID de chat único de Telegram del alumno (ej. `7635568207`).
-*   `nombre_estudiante`: Nombres del estudiante.
-*   `apellido_estudiante`: Apellidos del estudiante.
-
-### Pestaña: `disponibilidad` ⏰
-Define los bloques horarios de atención de cada tutor para el próximo lunes:
-*   `id_disponibilidad`: Identificador del bloque (ej. `DIS001`).
-*   `id_tutor`: ID del tutor asociado.
-*   `dia_semana`: Día asignado (únicamente `LUNES`).
-*   `hora_inicio`: Hora de inicio del bloque (ej. `6:00`).
-*   `hora_fin`: Hora de finalización del bloque (ej. `11:00`).
-*   `estado`: Estado del bloque (`LIBRE` / `OCUPADO`).
-
-### Pestaña: `tutorias` 📋
-Registra el historial completo de citas académicas agendadas en el sistema:
-*   `id_tutoria`: Código único de referencia de la tutoría (ej. `TUT-9861`).
-*   `id_estudiante`: ID de Telegram del estudiante que reservó.
-*   `id_tutor`: ID del tutor asignado.
-*   `materia`: Nombre de la asignatura agendada.
-*   `fecha`: Fecha de la tutoría (formato limpio `YYYY-MM-DD`).
-*   `hora_inicio`: Hora de inicio de la sesión.
-*   `hora_fin`: Hora de fin de la sesión.
-*   `estado`: Estado de la tutoría (`Asignada`, `Cancelada`).
-*   `url_de_conexion`: Enlace dinámico al aula virtual (`link_here`).
-
-### Pestaña: `secciones` (Control de Sesión) 💾
-Fundamental para el funcionamiento del Enrutador de Estados (Traffic Cop):
-*   `usuario_telegram`: ID de chat único del usuario de Telegram.
-*   `pantalla_actual`: Fase conversacional en la que se encuentra el estudiante (ej. `Menu`, `reinicio`).
-*   `paso_actual`: Estado lógico para saber qué subflujo procesar (ej. `solicitando tutoria`, `Cancelando tutoria`, `eligiendo opciones`).
-*   `datos_parciales`: JSON dinámico que almacena las elecciones temporales del estudiante en flujos multi-paso.
+👉 [Ingrese aquí para ver la estructura de la base de datos](https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=sharing)
 
 ---
 
-## ⚙️ 3. Arquitectura del Enrutador de Estados ("Traffic Cop")
+## ⚙️ 3. Arquitectura y Lógica de Sesiones
 
-Para evitar flujos gigantescos, desordenados y difíciles de depurar, se implementó el patrón arquitectónico **Traffic Cop**. El flujo principal (`validacion_usuario`) actúa como un policía de tránsito de datos que intercepta el mensaje entrante, consulta la base de datos de sesiones y decide qué subflujo ejecutar:
+Para mantener un sistema ordenado y evitar flujos gigantescos difíciles de mantener en n8n, implementamos un control de estado de sesión centralizado en la pestaña `secciones` de Google Sheets. 
 
-```
-                     [ Estudiante escribe en Telegram ]
-                                     │
-                        [ validacion_usuario ] (Trigger)
-                                     │
-                       [ consulta_existencia en DB ]
-                                    / \
-                                  /     \
-                       [ No Existe ]   [ Sí Existe ]
-                             │                 │
-               [ Envía Link Registro ]   [ consulta_seccion en DB ]
-                             │                 │
-               [ Formulario Registro ]   [ Switch: pantalla_actual ]
-                                                │
-               ┌───────────────────────┬────────┴──────────────┐
-               ▼                       ▼                       ▼
-      [ solicitando tutoria ] [ Cancelando tutoria ]          [ Menu ]
-               │                       │                       │
-     [ eligiendo_materia ]    [ procesar_anulacion ]      [ Switch1 (Opciones) ]
-                                                        ┌──────┼──────┐
-                                                        ▼      ▼      ▼
-                                                       (1)    (2)    (3)
-                                                        │      │      │
-                                                     [Sol.] [Cons.] [Canc.]
-```
-
-### El proceso lógico es el siguiente:
-1.  **Filtro de Entrada:** Cada mensaje de Telegram es capturado y consulta la pestaña `estudiantes` para validar si el ID existe. Si no existe, se desvía el flujo para enviarle el link al formulario de registro en la nube.
-2.  **Evaluación de Sesión:** Si el estudiante está registrado, se consulta su `pantalla_actual` y `paso_actual` en la pestaña `secciones`.
-3.  **Enrutamiento Inteligente:** Dependiendo de ese estado:
-    *   Si el paso es `solicitando tutoria`: Se redirige el texto al subflujo de agendamiento (`eligiendo_materia`).
-    *   Si el paso es `Cancelando tutoria`: Se redirige al subflujo de anulación (`cancelar_tutoria` en modo de confirmación).
-    *   Si el paso está vacío o es `Menu`: Se asume que el usuario está en el menú principal y se evalúa el mensaje. Si digita `1`, `2` o `3`, se ejecutan las respectivas opciones lógicas; si escribe texto libre, el flujo desvía la conversación al **Agente de IA**.
+El proceso es sumamente sencillo e intuitivo:
+1.  **Filtro de Entrada:** Cada vez que escribes al bot, el sistema consulta si ya te encuentras registrado como estudiante. Si no existes, te desvía inmediatamente al formulario de registro en línea.
+2.  **Control de Estados:** Si ya existes, lee tu sesión activa de la base de datos. El bot sabe exactamente si estás navegando en el Menú Principal, si estás solicitando una tutoría, o si estás en proceso de cancelar una asesoría.
+3.  **Enrutamiento:** Con base en ese estado registrado, redirige automáticamente tu mensaje al subflujo secundario correspondiente para procesarlo. Si escribes cualquier texto libre fuera de las opciones numéricas, un Agente de IA intercepta el mensaje para guiarte cordialmente en lenguaje natural.
 
 ---
 
@@ -187,12 +129,12 @@ El sistema completo se encuentra distribuido de forma profesional en **múltiple
     *   `Calcular Estadísticas` (Code in JavaScript): Script que procesa los datos y calcula las siguientes métricas de gestión:
         *   Total de solicitudes procesadas.
         *   Número de tutorías activas (estado "Asignada").
-        *   Número de tutorías anuladas (estado "Cancelada").
+        *   Número de tutorías anuladas (estado \"Cancelada\").
         *   Desglose exacto de demanda por asignatura (`Software`, `Inglés` y `Ser`).
     *   `Enviar Reporte` (Telegram): Envía el reporte analítico gerencial a un único Chat ID fijo (del administrador/coordinador) para evitar spam en los chats de los alumnos.
 
 ### 4.10. Módulo de IA: `AI Agent` (Fallback Inteligente) 🧠
-*   **Función:** Interceptar mensajes de texto libre que no corresponden a opciones del menú tradicional (ej. "Hola", "¿quién da clases de Software?", "¿a qué hora atiende Pilar?") y responder cordialmente en lenguaje natural guiando al alumno a autogestionarse.
+*   **Función:** Interceptar mensajes de texto libre que no corresponden a opciones del menú tradicional (ej. "Hola", "¿quién da clases de Software?", "¿a qué hora atiende Pilar?") y responder cordialmente en lenguaje natural guando al alumno a autogestionarse.
 *   **Nodos Clave:**
     *   `AI Agent` (LangChain): El nodo inteligente central conectado al flujo principal.
     *   `Google Gemini Chat Model`: Motor inteligente configurado con el modelo `gemini-2.5-flash` para optimizar tokens y tiempo de respuesta.
@@ -210,7 +152,7 @@ Sigue estos pasos para implementar TutorBot en tu propio entorno:
     *   Busca a `@BotFather` en Telegram, ejecuta `/newbot`, define el nombre del bot y guarda el **token de la API** proporcionado.
 3.  **Configurar la Base de Datos:**
     *   Crea una hoja de cálculo en Google Sheets llamada **`TutorBot_DB`**.
-    *   Crea las pestañas `tutores`, `estudiantes`, `disponibilidad`, `tutorias`, y `secciones` con la estructura de columnas detallada en la Sección 2.
+    *   Crea las pestañas `tutores`, `estudiantes`, `disponibilidad`, `tutorias`, y `secciones` con la estructura correspondiente.
     *   Comparte la base de datos con permisos de **Lectura** al correo electrónico del profesor/evaluador.
 4.  **Importar los flujos en n8n:**
     *   Crea un nuevo proyecto en tu espacio de n8n.
