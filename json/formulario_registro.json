@@ -1,0 +1,264 @@
+{
+  "name": "formulario_registro",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Registro de estudiantes",
+        "formFields": {
+          "values": [
+            {
+              "fieldType": "hiddenField",
+              "fieldName": "idestudiante"
+            },
+            {
+              "fieldLabel": "Nombres"
+            },
+            {
+              "fieldLabel": "Apellidos"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "3fd6d295-2014-4519-8f52-9eb41ad3e642",
+      "name": "On form submission",
+      "webhookId": "a03e0aec-5eeb-4a47-bd8f-e78d6f989adc"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 702878591,
+          "mode": "list",
+          "cachedResultName": "estudiantes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=702878591"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nombre_estudiante": "={{ $('On form submission').item.json.Nombres }}",
+            "apellido_estudiante": "={{ $('On form submission').item.json.Apellidos }}",
+            "id_estudiante": "={{ $json.idestudiante }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id_estudiante",
+              "displayName": "id_estudiante",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nombre_estudiante",
+              "displayName": "nombre_estudiante",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "apellido_estudiante",
+              "displayName": "apellido_estudiante",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        0
+      ],
+      "id": "5efa63c6-7b37-4378-85a3-7d1ead611a2c",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1767426209,
+          "mode": "list",
+          "cachedResultName": "secciones",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=1767426209"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "usuario_telegram": "={{ $('Edit Fields').item.json.idestudiante }}",
+            "pantalla_actual": "\"\"",
+            "paso_actual": "\"\"",
+            "datos_parciales": "\"\""
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "usuario_telegram",
+              "displayName": "usuario_telegram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pantalla_actual",
+              "displayName": "pantalla_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paso_actual",
+              "displayName": "paso_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "datos_parciales",
+              "displayName": "datos_parciales",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        0
+      ],
+      "id": "39c06fa8-0f2a-4858-b0eb-9c42194ba2dd",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "30c5f235-ec34-48dd-9c95-a50fe9d34b5f",
+              "name": "idestudiante",
+              "value": "={{ $json.idestudiante }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        32,
+        0
+      ],
+      "id": "154ca7f1-889b-4c7c-ba09-665dced0c46b",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "840da2bd-d09c-47a5-987d-c9e3f9986458",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6fcfdf5ede3d3e02de551675bbb314bed1edccb2ee146222cbfaf7e8945a954f"
+  },
+  "nodeGroups": [],
+  "id": "YCLVuIg02XwpwDKW",
+  "tags": []
+}

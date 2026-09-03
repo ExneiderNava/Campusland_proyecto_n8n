@@ -1,0 +1,253 @@
+{
+  "name": "reporte_diario_coordinacion",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 16
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -48,
+        48
+      ],
+      "id": "f6d999e7-7e3c-49f9-bafc-af31b04c2096",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -128
+      ],
+      "id": "fcd9b6f4-f14d-4e24-8afe-392756879353",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 386476655,
+          "mode": "list",
+          "cachedResultName": "tutorias",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=386476655"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        -48
+      ],
+      "id": "2ba057f3-2e30-429c-91fc-a3568ed24bb1",
+      "name": "Leer Tutorias",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "tutores",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        640,
+        -48
+      ],
+      "id": "5aaea0b0-5045-4c42-8a57-f1191d1201a5",
+      "name": "Leer Tutores",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Capturamos los datos de los tres nodos de Sheets\nconst estudiantes = $(\"Leer Estudiantes\").all(); // Lista de estudiantes registrados\nconst tutores = $(\"Leer Tutores\").all(); // Lista de tutores\nconst tutorias = $(\"Leer Tutorias\").all(); // Lista de tutorías agendadas\n\n// 2. Mapeamos los tutores en un objeto rápido (id_tutor -> Nombre)\nconst mapaTutores = {};\ntutores.forEach(t => {\n  mapaTutores[t.json.id_tutor] = t.json.nombre;\n});\n\n// 3. Calculamos la fecha actual en formato \"YYYY-MM-DD\" en la zona horaria local\nconst hoy = new Date();\nconst offset = hoy.getTimezoneOffset();\nconst fechaHoy = new Date(hoy.getTime() - (offset * 60 * 1000)).toISOString().split('T').at(0);\n\n// 4. Filtramos las tutorías que sean para HOY y estén en estado \"Asignada\"\nconst tutoriasDeHoy = tutorias.filter(t => {\n  let fechaTut = t.json.fecha;\n  \n  // Limpiamos formato si tiene corchetes o comillas de residuos anteriores\n  if (fechaTut && typeof fechaTut === 'string' && fechaTut.startsWith(\"[\")) {\n    try { \n      const arr = JSON.parse(fechaTut);\n      fechaTut = Array.isArray(arr) ? arr.at(0) : arr; \n    } catch (e) {}\n  }\n  return fechaTut === fechaHoy && t.json.estado === \"Asignada\";\n});\n\n// 5. Construimos el mensaje estético consolidado (será el mismo para todos)\nlet mensaje = \"\";\nif (tutoriasDeHoy.length === 0) {\n  mensaje = \"📭 *REPORTE DIARIO DE TUTORÍAS*\\n\\nNo hay tutorías programadas para el día de hoy (\" + fechaHoy + \") en el sistema.\\n\\nEl sistema está libre y listo para recibir nuevos agendamientos. 🤖\";\n} else {\n  mensaje = \"📋 *REPORTE DIARIO DE TUTORÍAS (HOY: \" + fechaHoy + \")*\\n\";\n  mensaje += \"Se encontraron *\" + tutoriasDeHoy.length + \"* tutorías asignadas para el día de hoy en el sistema:\\n\\n\";\n\n  tutoriasDeHoy.forEach((t, index) => {\n    const nombreTutor = mapaTutores[t.json.id_tutor] || \"Tutor asignado\";\n    mensaje += \"🔔 *Tutoría #\" + (index + 1) + \"* (Ref: _\" + t.json.id_tutoria + \"_)\\n\";\n    mensaje += \"📚 *Materia:* \" + t.json.materia + \"\\n\";\n    mensaje += \"👨‍🏫 *Tutor:* \" + nombreTutor + \"\\n\";\n    mensaje += \"⏰ *Horario:* \" + t.json.hora_inicio + \" - \" + t.json.hora_fin + \"\\n\";\n    mensaje += \"🔗 *Aula Virtual:* \" + (t.json.url_de_conexion || \"link_here\") + \"\\n\";\n    mensaje += \"--------------------------------\\n\\n\";\n  });\n  \n  mensaje += \"🤖 _Este reporte diario ha sido consolidado de manera automática desde la base de datos de TutorBot._\";\n}\n\n// 6. Multiplicamos la salida: Generamos un elemento independiente por cada estudiante registrado\n// n8n procesará de forma nativa e iterará sobre cada elemento al llegar al nodo de Telegram\nreturn estudiantes.map(est => {\n  return {\n    json: {\n      id_estudiante: est.json.id_estudiante, // ID único de Telegram del alumno\n      nombre_estudiante: est.json.nombre_estudiante,\n      mensaje_reporte: mensaje\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        -48
+      ],
+      "id": "8e2803cb-72e6-4e10-b8dc-4b47d8ecca18",
+      "name": "Consolidar Reporte"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 702878591,
+          "mode": "list",
+          "cachedResultName": "estudiantes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=702878591"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        256,
+        -48
+      ],
+      "id": "fabd91ab-aec1-4624-b1ba-822f210c534b",
+      "name": "Leer Estudiantes",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.id_estudiante }}",
+        "text": "={{ $json.mensaje_reporte }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1072,
+        -48
+      ],
+      "id": "e854ea00-69b5-49c2-9503-d7eb58b3a9ba",
+      "name": "Send a text message",
+      "webhookId": "d4579b86-ce1a-4b67-83f1-d32e384316ff",
+      "credentials": {
+        "telegramApi": {
+          "id": "2Fyqyxu7Bxb6E0DW",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Leer Estudiantes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Leer Estudiantes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer Tutorias": {
+      "main": [
+        [
+          {
+            "node": "Leer Tutores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer Tutores": {
+      "main": [
+        [
+          {
+            "node": "Consolidar Reporte",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer Estudiantes": {
+      "main": [
+        [
+          {
+            "node": "Leer Tutorias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidar Reporte": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "05b30d0d-4ec0-4077-8e6e-fa567ae573c8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6fcfdf5ede3d3e02de551675bbb314bed1edccb2ee146222cbfaf7e8945a954f"
+  },
+  "nodeGroups": [],
+  "id": "096pFZCt1VPP7Fob",
+  "tags": []
+}
