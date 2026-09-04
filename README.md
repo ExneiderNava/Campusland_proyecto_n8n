@@ -52,6 +52,9 @@ El sistema completo se encuentra distribuido de forma profesional en  **múltipl
     *   `consulta_seccion` (Google Sheets): Obtiene el estado conversacional del alumno desde la pestaña `secciones`.
     *   `Switch` (Enrutador de Estados): Redirige el flujo lógicamente a los flujos secundarios mediante el nodo `Execute Workflow`.
 
+<img width="1853" height="871" alt="image" src="https://github.com/user-attachments/assets/7925968b-ae2a-422f-889b-2aeb387e25c8" />
+
+
 ##### 4.2. Flujo de Soporte: formulario_registro 📝
 *   **Función:** Recibir los datos del formulario web de registro de n8n, agregarlos a la base de datos de estudiantes y dar inicio a su sesión.
 *   **Nodos Clave:**
@@ -60,11 +63,17 @@ El sistema completo se encuentra distribuido de forma profesional en  **múltipl
     *   `Append row in sheet1` (Google Sheets): Crea el registro inicial en la pestaña `secciones` con estado de pantalla `Menu` para desbloquear el bot.
     *   *Mejora de UX (Redirección):* Configurada la opción nativa `Redirect URL` para enviar al estudiante automáticamente de regreso al chat de Telegram al dar clic en enviar.
 
+<img width="1851" height="838" alt="image" src="https://github.com/user-attachments/assets/2a6c8a35-62d0-40d0-a4e3-3202d49c8929" />
+
+
 ##### 4.3. Flujo de Soporte: menu_usuario 📱
 *   **Función:** Registrar la sesión en estado `Menu` dentro de Google Sheets y enviar el mensaje de bienvenida y autogestión de manera estática.
 *   **Nodos Clave:**
     *   `Append or update row in sheet` (Google Sheets): Setea la pantalla en `Menu` y el paso en `eligiendo opciones`.
     *   `Send a text message` (Telegram): Envía las opciones interactivas para que el alumno elija (1. Solicitar, 2. Consultar, 3. Cancelar).
+
+<img width="1852" height="888" alt="image" src="https://github.com/user-attachments/assets/d5af91c3-c39f-45c9-bf50-8f4b6224a387" />
+
 
 ##### 4.4. Flujo de Soporte: solicitar_tutoria 🗓️
 *   **Función:** Consultar el catálogo de materias configuradas en la base de datos de tutores y construir un menú dinámico y estético para Telegram.
@@ -72,6 +81,9 @@ El sistema completo se encuentra distribuido de forma profesional en  **múltipl
     *   `Get row(s) in sheet` (Google Sheets): Lee todos los registros de la pestaña `tutores`.
     *   `Code in JavaScript` (Code): Recorre las materias configuradas y arma una lista numerada usando emojis (1️⃣ Software, 2️⃣ Inglés, etc.) de forma dinámica.
     *   `Send a text message` (Telegram): Envía el listado de selección al chat de Telegram del estudiante.
+
+<img width="1850" height="893" alt="image" src="https://github.com/user-attachments/assets/13ff6a4c-05ae-4954-8596-deaecb0ed087" />
+
 
 ##### 4.5. Flujo de Soporte: eligiendo_materia ⚠️ (Con Validación de Duplicidad)
 *   **Función:** Procesar la materia que el alumno seleccionó, extraer la disponibilidad asignada para el tutor de dicha materia, validar matemáticamente que no existan cruces de horarios y registrar la tutoría.
@@ -85,6 +97,9 @@ El sistema completo se encuentra distribuido de forma profesional en  **múltipl
         *   **Rama True (Existe Cruce):** Ejecuta `Resetear Estado por Duplicidad` en la sesión, cancela el agendamiento y envía un mensaje detallado a Telegram explicando que el tutor o el estudiante ya están ocupados en ese horario.
         *   **Rama False (Cita Libre):** Ejecuta `Append row in sheet` para guardar la cita en estado `Asignada` con un código de referencia dinámico generado de forma aleatoria (`TUT-XXXX`), asigna el enlace del aula virtual, resetea la sesión en `secciones` a `reinicio` y envía la tarjeta de confirmación al estudiante.
 
+<img width="1845" height="851" alt="image" src="https://github.com/user-attachments/assets/15f9b12a-780a-42ae-80a9-93c9f630fc00" />
+
+
 ##### 4.6. Flujo de Soporte: consultar_tutoria 🔎
 *   **Función:** Consultar las tutorías activas agendadas en la base de datos de Google Sheets que le corresponden al estudiante que hace la petición, cruzando los nombres reales de los tutores asignados.
 *   **Nodos Clave:**
@@ -92,6 +107,9 @@ El sistema completo se encuentra distribuido de forma profesional en  **múltipl
     *   `Get row(s) in sheet1` (Google Sheets): Trae el catálogo de tutores oficiales.
     *   `Code in JavaScript` (Code): Realiza un cruce lógico indexando los tutores por su ID y filtra de forma segura las tutorías activas (estado "Asignada"). Construye un reporte de texto estructurado y elegante en Markdown con emojis.
     *   `Send a text message` (Telegram): Despacha el reporte consolidado directo al Telegram del estudiante.
+
+<img width="1853" height="897" alt="image" src="https://github.com/user-attachments/assets/99123a95-1d66-46b9-9a7f-56990c2e9ad4" />
+
 
 ##### 4.7. Flujo de Soporte: cancelar_tutoria ❌ (Con Excepción de Cero Citas y Guardián "0")
 *   **Función:** Mostrar las tutorías activas del alumno para que digite el código de referencia (`TUT-XXXX`), actualizar el estado de la cita a "Cancelada" y restablecer su sesión, incluyendo un guardián inteligente que valida códigos reales y una opción de pánico (`0`) para anular la acción de forma segura.
@@ -104,6 +122,9 @@ El sistema completo se encuentra distribuido de forma profesional en  **múltipl
         *   **Rama True:** Llama a `Update row in sheet` para marcar el estado como `cancelada` y actualiza la sesión a `reinicio` enviando la confirmación de éxito.
         *   **Rama False:** Mantiene el estado `Cancelando tutoria` y dispara `Notificar Código Inválido` para indicarle al alumno el error y recordarle el botón de escape `0`.
 
+<img width="1866" height="871" alt="image" src="https://github.com/user-attachments/assets/607c9437-27ec-4a89-8502-725cf7358619" />
+
+
 ##### 4.8. Flujo Programado: reporte_diario_coordinacion 🔔 (Recordatorios Diarios)
 *   **Función:** Ejecutarse de manera automática todos los días para enviar un recordatorio masivo e individualizado con su respectivo enlace de conexión a cada estudiante que tenga una clase asignada para el día de hoy.
 *   **Nodos Clave:**
@@ -111,6 +132,9 @@ El sistema completo se encuentra distribuido de forma profesional en  **múltipl
     *   `Leer Estudiantes` / `Leer Tutorias` / `Leer Tutores` (Google Sheets): Consulta y extrae las tres hojas de la base de datos.
     *   `Consolidar Reporte` (Code in JavaScript): Calcula la fecha actual en la zona horaria local, filtra las tutorías activas de hoy y asocia el nombre de los tutores. Retorna una lista con la información individualizada de cada estudiante.
     *   `Send a text message` (Telegram): Gracias a la iteración nativa por ítems de n8n, envía de forma secuencial y paralela un mensaje personalizado a cada estudiante a su Chat ID de Telegram correspondiente, sin necesidad de bucles complejos de programación.
+
+<img width="1856" height="865" alt="image" src="https://github.com/user-attachments/assets/3bd2a88e-07ba-409b-890a-b71558f77318" />
+
 
 ##### 4.9. Flujo Programado: reporte_semanal_coordinacion 📊 (Métricas de Gestión)
 *   **Función:** Recopilar estadísticas acumuladas de actividad en el sistema y enviarlas semanalmente de forma consolidada al administrador o coordinación académica.
@@ -124,19 +148,16 @@ El sistema completo se encuentra distribuido de forma profesional en  **múltipl
         *   Desglose exacto de demanda por asignatura (`Software`, `Inglés` y `Ser`).
     *   `Enviar Reporte` (Telegram): Envía el reporte analítico gerencial a un único Chat ID fijo (del administrador/coordinador) para evitar spam en los chats de los alumnos.
 
+<img width="1848" height="892" alt="image" src="https://github.com/user-attachments/assets/376cbb67-bdca-4927-bc5d-c7d737fc58cb" />
+
+
 ##### 4.10. Flujo de Resiliencia: TutorBot_Manejador_Errores 🚨 (Manejador Global de Errores)
 *   **Función:** Interceptar de manera centralizada y asíncrona cualquier error en tiempo de ejecución ocurrido en cualquiera de los otros subflujos del sistema, enviando una alerta detallada al administrador para garantizar resiliencia absoluta de producción.
 *   **Nodos Clave:**
     *   `Error Trigger`: Disparador global que se activa automáticamente al fallar un nodo.
     *   `Send a text message` (Telegram): Despacha una tarjeta detallada al Chat ID del administrador con el nombre del flujo fallido, el nodo culpable, el ID de ejecución y el mensaje de error de la API o sistema.
 
-##### 4.11. Módulo de IA: AI Agent (Fallback Inteligente) 🧠
-*   **Función:** Interceptar mensajes de texto libre que no corresponden a opciones del menú tradicional (ej. "Hola", "¿quién da clases de Software?", "¿a qué hora atiende Pilar?") y responder cordialmente en lenguaje natural guiando al alumno a autogestionarse.
-*   **Nodos Clave:**
-    *   `AI Agent` (LangChain): El nodo inteligente central conectado al flujo principal.
-    *   `Google Gemini Chat Model`: Motor inteligente configurado con el modelo `gemini-2.5-flash` para optimizar tokens y tiempo de respuesta.
-    *   `Simple Memory` (Window Buffer Memory): Memoria selectiva de hasta 10 interacciones para recordar el contexto de la charla.
-    *   `System Message`: Contiene el rol oficial de TutorBot, las reglas de asignación y las clases disponibles (Software, Inglés, Ser), además de directrices estrictas de formato para evitar errores de renderizado en Telegram.
+<img width="1847" height="892" alt="image" src="https://github.com/user-attachments/assets/e4918f7d-1083-4bbb-ac22-66fe4d9c854c" />
 
 --------------------------------------------------------------------------------
 
