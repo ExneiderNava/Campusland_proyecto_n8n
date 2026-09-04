@@ -67,10 +67,10 @@ El sistema completo se encuentra distribuido de forma profesional en  **múltipl
 
 
 ##### 4.3. Flujo de Soporte: menu_usuario 📱
-*   **Función:** Registrar la sesión en estado `Menu` dentro de Google Sheets y enviar el mensaje de bienvenida y autogestión de manera estática.
+*   **Función:** Registrar la sesión en estado `Menu` dentro de Google Sheets y enviar el mensaje de bienvenida y autogestión de manera dinamica con respuesta del agente de IA.
 *   **Nodos Clave:**
     *   `Append or update row in sheet` (Google Sheets): Setea la pantalla en `Menu` y el paso en `eligiendo opciones`.
-    *   `Send a text message` (Telegram): Envía las opciones interactivas para que el alumno elija (1. Solicitar, 2. Consultar, 3. Cancelar).
+    *   `Send a text message` (Telegram): El agente de IA Envía las opciones interactivas para que el alumno elija (1. Solicitar, 2. Consultar, 3. Cancelar).
 
 <img width="1852" height="888" alt="image" src="https://github.com/user-attachments/assets/d5af91c3-c39f-45c9-bf50-8f4b6224a387" />
 
