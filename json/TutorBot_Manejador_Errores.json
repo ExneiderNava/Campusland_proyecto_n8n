@@ -1,0 +1,65 @@
+{
+  "name": "TutorBot_Manejador_Errores",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "030cb592-9378-4e2c-bb3c-30c06646ea1a",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "chatId": "7635568207",
+        "text": "=🚨 *ALERTA DE FALLO EN TUTORBOT* 🚨\nSe ha interceptado un error en tiempo de ejecución.\n\nAquí están los detalles para su depuración:  \n🔹 *Workflow:* {{ $json.workflow.name }} \n🔹 *Nodo:* {{ $json.node.name }} \n🔹 *Mensaje:* {{ $json.error.message }} \n🔹 *ID de Ejecución:* `{{ $json.execution.id }}` \n\n👉 _Por favor, ingresa al panel de n8n para verificar el historial de ejecuciones y solucionar el nodo afectado._ 🛠️",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "345565a7-6c6e-462d-9a20-9a2fce235515",
+      "name": "Send a text message",
+      "webhookId": "6a98369d-8be0-4ab8-a2ad-eff37b86bfd4",
+      "credentials": {
+        "telegramApi": {
+          "id": "2Fyqyxu7Bxb6E0DW",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3672828b-cbbf-45e9-a566-193c42840665",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6fcfdf5ede3d3e02de551675bbb314bed1edccb2ee146222cbfaf7e8945a954f"
+  },
+  "nodeGroups": [],
+  "id": "fe5z25IdysYkwF2R",
+  "tags": []
+}
