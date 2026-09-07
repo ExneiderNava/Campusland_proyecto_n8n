@@ -50,28 +50,6 @@
                 },
                 "conditions": [
                   {
-                    "id": "1fb71892-4159-430c-984f-1e08377d520a",
-                    "leftValue": "={{ $json.paso_actual }}",
-                    "rightValue": "solicitando tutoria",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
                     "id": "b5db0da4-a1fb-4a70-97f5-a48cdd83238a",
                     "leftValue": "={{ $json.paso_actual }}",
                     "rightValue": "Cancelando tutoria",
@@ -136,8 +114,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        800,
-        -192
+        816,
+        -160
       ],
       "id": "109accb3-e5e9-4e5f-8ec5-ad9f14c2421a",
       "name": "Switch"
@@ -226,58 +204,6 @@
       ],
       "id": "aad8882a-c7e2-49f1-9cbf-b509a3d15313",
       "name": "Switch1"
-    },
-    {
-      "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "l1g8gqPENjegTJzC",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/l1g8gqPENjegTJzC",
-          "cachedResultName": "eligiendo_materia"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "id_usuario": "={{ $('usuario_escribe').item.json.message.chat.id }}",
-            "texto": "={{ $('usuario_escribe').item.json.message.text }}"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "id_usuario",
-              "displayName": "id_usuario",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "number",
-              "removed": false
-            },
-            {
-              "id": "texto",
-              "displayName": "texto",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": true,
-          "convertFieldsToString": true
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        1008,
-        -384
-      ],
-      "id": "d922815a-d443-4264-8fbf-140ebf330854",
-      "name": "eligiendo_materias"
     },
     {
       "parameters": {
@@ -381,60 +307,6 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "ROew1NLy3t7HHBHp",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/ROew1NLy3t7HHBHp",
-          "cachedResultName": "solicitar_tutoria"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "nombre": "={{ $('consulta_existencia').item.json.nombre_estudiante }} {{ $('consulta_existencia').item.json.apellido_estudiante }}",
-            "id_chat": "={{ $('usuario_escribe').item.json.message.chat.id }}"
-          },
-          "matchingColumns": [
-            ""
-          ],
-          "schema": [
-            {
-              "id": "nombre",
-              "displayName": "nombre",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            },
-            {
-              "id": "id_chat",
-              "displayName": "id_chat",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "number",
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": true,
-          "convertFieldsToString": true
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        1504,
-        -432
-      ],
-      "id": "ca4ce868-8478-474f-be98-2a4fb19570b5",
-      "name": "Solicitar tutoria"
-    },
-    {
-      "parameters": {
-        "workflowId": {
-          "__rl": true,
           "value": "lbAXTHyM6kw1ognF",
           "mode": "list",
           "cachedResultUrl": "/workflow/lbAXTHyM6kw1ognF",
@@ -479,8 +351,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        1344,
-        -240
+        1424,
+        -208
       ],
       "id": "97f7f4be-a7df-4bfe-b769-b0c0392cacf0",
       "name": "Consultar_tutorias"
@@ -695,96 +567,6 @@
           "value": {
             "usuario_telegram": "={{ $('usuario_escribe').item.json.message.chat.id }}",
             "pantalla_actual": "Menu",
-            "paso_actual": "solicitando tutoria",
-            "datos_parciales": "\"\""
-          },
-          "matchingColumns": [
-            "usuario_telegram"
-          ],
-          "schema": [
-            {
-              "id": "usuario_telegram",
-              "displayName": "usuario_telegram",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "pantalla_actual",
-              "displayName": "pantalla_actual",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "paso_actual",
-              "displayName": "paso_actual",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "datos_parciales",
-              "displayName": "datos_parciales",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
-      "position": [
-        1264,
-        -416
-      ],
-      "id": "69428837-4d6d-411a-8601-ee908cc1b5db",
-      "name": "actualiza_seccion",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "qJpXBFx8Rn1PgSYQ",
-          "name": "Google Sheets account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "appendOrUpdate",
-        "documentId": {
-          "__rl": true,
-          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
-          "mode": "list",
-          "cachedResultName": "TutorBot_DB",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 1767426209,
-          "mode": "list",
-          "cachedResultName": "secciones",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=1767426209"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "usuario_telegram": "={{ $('usuario_escribe').item.json.message.chat.id }}",
-            "pantalla_actual": "Menu",
             "paso_actual": "Cancelando tutoria",
             "datos_parciales": "\"\""
           },
@@ -941,7 +723,7 @@
         "promptType": "define",
         "text": "={{ $('usuario_escribe').item.json.message.text }}",
         "options": {
-          "systemMessage": "Eres TutorBot, el asistente conversacional e inteligente de tutorías académicas de la institución. Tu propósito es resolver las dudas de forma amable, muy corta y sencilla.\n\nIMPORTANTE: Responde siempre con mensajes súper breves, directos y resumidos. Evita explicaciones largas.\n\nActualmente, solo prestas asesoría sobre la información académica oficial del bot. No inventes datos que no estén aquí especificados.\n\nEstas son las reglas del sistema y la información con la que debes responder:\n\n### 1. ASIGNATURAS DISPONIBLES\nSolo existen tres asignaturas o clases disponibles en el sistema:\n🔹 Software\n🔹 Inglés\n🔹 Ser\n\n(No menciones tutores ni horarios en ningún momento).\n\n### 2. REGLAS PARA AGENDAR TUTORÍAS\n🔹 El sistema cuenta con validación de duplicidad estricta para evitar cruces de agenda en el mismo horario.\n🔹 El aula virtual se asigna de manera automática al confirmar.\n\n### 3. ACCIONES AUTOGESTIONABLES DEL MENÚ\nSi el estudiante desea realizar una acción, explícale de forma muy breve que debe escribir el número de la opción en el chat:\n1. Enviar *1*: Para Solicitar Tutoría (ver catálogo de materias).\n2. Enviar *2*: Para Consultar Tutorías activas.\n3. Enviar *3*: Para Cancelar Tutoría (solicitará el código TUT-XXXX).\n\n### 4. REGLAS DE FORMATO OBLIGATORIAS (¡SÍGUELAS ESTRICTAMENTE!)\n🔹 NUNCA utilices dobles asteriscos (**) para negrita. Telegram fallará. Si quieres resaltar una palabra, usa únicamente un asterisco a cada lado (*ejemplo*).\n🔹 NUNCA uses guiones (- ) ni asteriscos (* ) al inicio de las líneas para hacer listas. Usa emojis (como 🔹, 🗓️, 🔎, ❌) o números (1., 2.) como viñetas.\n🔹 Invita siempre de forma muy breve al usuario a escribir 1, 2 o 3 para autogestionarse."
+          "systemMessage": "Eres TutorBot, el asistente conversacional e inteligente de tutorías académicas de la institución. \n\nREGLA DE IDENTIDAD OBLIGATORIA: Siempre que respondas a cualquier pregunta o mensaje del usuario, debes iniciar tu respuesta diciendo explícitamente \"Soy TutorBot\" (por ejemplo: \"Soy TutorBot, el asistente académico...\" o \"Soy TutorBot. Claro que sí...\").\n\nTu propósito es resolver las dudas de forma amable, extremadamente corta y sencilla.\n\nIMPORTANTE: Responde siempre con mensajes súper breves, directos y resumidos para no alterar los formatos que acepta Telegram para el envío de mensajes. Evita explicaciones largas.\n\nActualmente, solo prestas asesoría sobre la información académica oficial del bot. No inventes datos que no estén aquí especificados.\n\nEstas son las reglas del sistema y la información con la que debes responder:\n\n### 1. ASIGNATURAS DISPONIBLES\nSolo existen tres asignaturas o clases disponibles en el sistema:\n🔹 Software\n🔹 Inglés\n🔹 Ser\n\n⚠️ REGLA DE ORO: NUNCA menciones nombres de tutores específicos ni horarios en tus respuestas. Explica al alumno que debe consultar y evaluar toda la disponibilidad de horarios y docentes directamente dentro del formulario interactivo de reserva.\n\n### 2. REGLAS PARA AGENDAR TUTORÍAS\n🔹 Para agendar, el estudiante debe ingresar al enlace del formulario dinámico (enviando el número 1 en el chat). Allí podrá ver en tiempo real qué tutores y horas están libres de lunes a viernes.\n🔹 El sistema cuenta con validación de duplicidad estricta para evitar cruces de agenda en el mismo horario.\n🔹 El aula virtual se genera y asigna de manera automática al confirmar la reserva.\n\n### 3. ACCIONES AUTOGESTIONABLES DEL MENÚ\nSi el estudiante desea realizar una acción, explícale de forma muy breve que debe escribir el número de la opción en el chat:\n1. Enviar *1*: Para solicitar una tutoría abriendo el Formulario Web dinámico (donde evaluará materias, tutores y horarios disponibles).\n2. Enviar *2*: Para Consultar tus tutorías activas ya programadas.\n3. Enviar *3*: Para Cancelar una tutoría activa (el sistema le solicitará el código TUT-XXXX para liberar el espacio).\n\n### 4. REGLAS DE FORMATO OBLIGATORIAS (¡SÍGUELAS ESTRICTAMENTE!)\n🔹 NUNCA utilices dobles asteriscos (**) para negrita. Telegram fallará. Si quieres resaltar una palabra, usa únicamente un asterisco a cada lado (*ejemplo*).\n🔹 NUNCA uses guiones (- ) ni asteriscos (* ) al inicio de las líneas para hacer listas. Usa emojis (como 🔹, 🗓️, 🔎, ❌) o números (1., 2.) como viñetas.\n🔹 Invita siempre de forma muy breve al usuario a escribir 1, 2 o 3 para autogestionarse en el chat."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -966,6 +748,28 @@
       ],
       "id": "4f93c2de-0b45-4447-ac36-4cbfec794c1f",
       "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('usuario_escribe').item.json.message.chat.id }}",
+        "text": "=Por favor, abre nuestro asistente interactivo para seleccionar la materia y tu horario disponible de lunes a viernes: \n\n👉 [Abrir Formulario de Reserva](https://exneider.app.n8n.cloud/webhook/solicitar-form?id_estudiante={{ $json.usuario_telegram }})",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1408,
+        -384
+      ],
+      "id": "82a78368-7e0f-4798-a95a-404ef1749b26",
+      "name": "solicitar tutoria",
+      "webhookId": "4bd45138-072e-4a85-b808-724468338b6c",
+      "credentials": {
+        "telegramApi": {
+          "id": "2Fyqyxu7Bxb6E0DW",
+          "name": "Telegram account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -990,13 +794,6 @@
     },
     "Switch": {
       "main": [
-        [
-          {
-            "node": "eligiendo_materias",
-            "type": "main",
-            "index": 0
-          }
-        ],
         [
           {
             "node": "procesar_anulacion",
@@ -1024,7 +821,7 @@
       "main": [
         [
           {
-            "node": "actualiza_seccion",
+            "node": "solicitar tutoria",
             "type": "main",
             "index": 0
           }
@@ -1097,17 +894,6 @@
         ]
       ]
     },
-    "actualiza_seccion": {
-      "main": [
-        [
-          {
-            "node": "Solicitar tutoria",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "actualiza_seccion_cancelar": {
       "main": [
         [
@@ -1162,7 +948,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "21631b58-69f0-4994-8322-5685b66e1da0",
+  "versionId": "310f7062-ddce-4fcf-a4db-51f008ef98b8",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "6fcfdf5ede3d3e02de551675bbb314bed1edccb2ee146222cbfaf7e8945a954f"

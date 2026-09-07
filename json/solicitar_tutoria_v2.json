@@ -1,0 +1,657 @@
+{
+  "name": "solicitar_tutoria_v2",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "solicitar-form",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -32,
+        -16
+      ],
+      "id": "0713f340-7dcd-4e36-9c5d-fbf7ffd97492",
+      "name": "Webhook",
+      "webhookId": "136ee50a-3c73-4de7-a767-eacb13b483c8"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "tutores",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        192,
+        -16
+      ],
+      "id": "070ac242-1188-46de-a381-7086ab834ffe",
+      "name": "Leer Tutores Form",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 285599454,
+          "mode": "list",
+          "cachedResultName": "disponibilidad",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=285599454"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "estado",
+              "lookupValue": "LIBRE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        -16
+      ],
+      "id": "1666ead2-a0ce-4fe9-afc4-278b08cb8db1",
+      "name": "Leer Disponibilidad Form",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Extraemos los datos de Sheets y el ID del estudiante desde la URL de Telegram\nconst disponibilidades = $input.all();\nconst tutores = $(\"Leer Tutores Form\").all();\nconst idEstudiante = $(\"Webhook\").first().json.query.id_estudiante;\n\n// 2. Mapeamos los tutores oficiales para relacionar sus materias\nconst listaTutores = tutores.map(t => ({\n  id_tutor: t.json.id_tutor.toString(),\n  nombre: t.json.nombre,\n  materia: t.json.materia\n}));\n\n// 3. Mapeamos las disponibilidades libres de la base de datos\nconst listaDispo = disponibilidades.map(d => ({\n  id_disponibilidad: d.json.id_disponibilidad,\n  id_tutor: d.json.id_tutor.toString(),\n  dia_semana: d.json.dia_semana,\n  hora_inicio: d.json.hora_inicio,\n  hora_fin: d.json.hora_fin\n}));\n\n// 4. Construimos la interfaz con JavaScript embebido para el filtrado dinámico\nconst htmlContent = `\n<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>TutorBot - Solicitar Tutoría</title>\n  <style>\n    body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }\n    .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 420px; }\n    h2 { margin-top: 0; color: #0088cc; font-size: 24px; text-align: center; }\n    p { color: #666; font-size: 13px; text-align: center; margin-bottom: 25px; line-height: 1.5; }\n    .form-group { margin-bottom: 18px; }\n    label { display: block; margin-bottom: 6px; font-weight: bold; color: #333; font-size: 13px; }\n    select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; background-color: #fff; color: #333; box-sizing: border-box; }\n    select:disabled { background-color: #eee; cursor: not-allowed; }\n    button { width: 100%; padding: 12px; background-color: #0088cc; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.2s; }\n    button:hover { background-color: #0077b3; }\n  </style>\n</head>\n<body>\n  <div class=\"card\">\n    <h2>🤖 TutorBot Agenda</h2>\n    <p>Completa los campos en orden para reservar tu tutoría. Los horarios se actualizan en tiempo real.</p>\n    \n    <form action=\"https://exneider.app.n8n.cloud/webhook/registrar-tutoria\" method=\"POST\">\n      <input type=\"hidden\" name=\"id_estudiante\" value=\"${idEstudiante}\">\n      <input type=\"hidden\" name=\"id_disponibilidad\" id=\"id_disponibilidad\">\n      <input type=\"hidden\" name=\"hora_inicio\" id=\"hora_inicio\">\n      <input type=\"hidden\" name=\"hora_fin\" id=\"hora_fin\">\n\n      <div class=\"form-group\">\n        <label for=\"materia\">1. Selecciona la Materia</label>\n        <select id=\"materia\" name=\"materia\" required onchange=\"filtrarTutores()\">\n          <option value=\"\" disabled selected>-- Elige una materia --</option>\n          <option value=\"Software\">Software</option>\n          <option value=\"Inglés\">Inglés</option>\n          <option value=\"Ser\">Ser</option>\n        </select>\n      </div>\n\n      <div class=\"form-group\">\n        <label for=\"tutor\">2. Selecciona el Tutor</label>\n        <select id=\"tutor\" name=\"id_tutor\" required disabled onchange=\"filtrarHorarios()\">\n          <option value=\"\" disabled selected>-- Primero elige materia --</option>\n        </select>\n      </div>\n\n      <div class=\"form-group\">\n        <label for=\"horario\">3. Selecciona el Horario</label>\n        <select id=\"horario\" name=\"horario_raw\" required disabled onchange=\"setHorarioValores()\">\n          <option value=\"\" disabled selected>-- Primero elige tutor --</option>\n        </select>\n      </div>\n\n      <button type=\"submit\">Agendar Tutoría 🎓</button>\n    </form>\n  </div>\n\n  <script>\n    // Inyección de bases de datos desde n8n\n    const tutores = ${JSON.stringify(listaTutores)};\n    const disponibilidades = ${JSON.stringify(listaDispo)};\n\n    function filtrarTutores() {\n      const materiaSel = document.getElementById(\"materia\").value;\n      const tutorSelect = document.getElementById(\"tutor\");\n      const horarioSelect = document.getElementById(\"horario\");\n      \n      tutorSelect.innerHTML = '<option value=\"\" disabled selected>-- Elige un tutor --</option>';\n      horarioSelect.innerHTML = '<option value=\"\" disabled selected>-- Primero elige tutor --</option>';\n      horarioSelect.disabled = true;\n\n      const filtrados = tutores.filter(t => t.materia === materiaSel);\n      \n      if(filtrados.length > 0) {\n        filtrados.forEach(t => {\n          tutorSelect.innerHTML += '<option value=\"' + t.id_tutor + '\">' + t.nombre + '</option>';\n        });\n        tutorSelect.disabled = false;\n      } else {\n        tutorSelect.innerHTML = '<option value=\"\" disabled selected>No hay tutores disponibles</option>';\n        tutorSelect.disabled = true;\n      }\n    }\n\n    function filtrarHorarios() {\n      const tutorSel = document.getElementById(\"tutor\").value;\n      const horarioSelect = document.getElementById(\"horario\");\n      \n      horarioSelect.innerHTML = '<option value=\"\" disabled selected>-- Elige un horario --</option>';\n\n      const filtrados = disponibilidades.filter(d => d.id_tutor === tutorSel);\n      \n      if(filtrados.length > 0) {\n        filtrados.forEach(d => {\n          const valor = JSON.stringify({id: d.id_disponibilidad, ini: d.hora_inicio, fin: d.hora_fin});\n          \n          // Formateamos el día de la semana estéticamente (Ej: \"MARTES\" -> \"Martes\")\n          const diaFormateado = d.dia_semana.charAt(0).toUpperCase() + d.dia_semana.slice(1).toLowerCase();\n          \n          // 💡 Lógica limpia con comillas dobles en JS y simples en HTML. ¡Cero caracteres de escape!\n          horarioSelect.innerHTML += \"<option value='\" + valor + \"'>📅 \" + diaFormateado + \": \" + d.hora_inicio + \" - \" + d.hora_fin + \"</option>\";\n        });\n        horarioSelect.disabled = false;\n      } else {\n        horarioSelect.innerHTML = '<option value=\"\" disabled selected>Sin horarios libres</option>';\n        horarioSelect.disabled = true;\n      }\n    }\n\n    function setHorarioValores() {\n      const rawVal = document.getElementById(\"horario\").value;\n      if (rawVal) {\n        const parsed = JSON.parse(rawVal);\n        document.getElementById(\"id_disponibilidad\").value = parsed.id;\n        document.getElementById(\"hora_inicio\").value = parsed.ini;\n        document.getElementById(\"hora_fin\").value = parsed.fin;\n      }\n    }\n  </script>\n</body>\n</html>\n`;\n\nreturn [{ json: { html: htmlContent } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        -16
+      ],
+      "id": "ffad73d9-e0f2-4087-8eff-79a4ecb70636",
+      "name": "Generar HTML Dinámico"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.html }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/html; charset=utf-8"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        864,
+        -16
+      ],
+      "id": "ee562cea-31c2-4883-a633-a3c38522531b",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "registrar-tutoria",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        208
+      ],
+      "id": "db9ce474-0dcc-48a4-b3c5-7041db7d3e5e",
+      "name": "Webhook1",
+      "webhookId": "b52d8de0-cac4-47af-9a72-e9ba074c559c"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.item.json.body;\n\n// Generar código aleatorio de tutoría (TUT-XXXX)\nconst idTutoria = 'TUT-' + Math.floor(1000 + Math.random() * 9000);\n\n// Calcular la fecha del próximo Lunes de forma determinista\nconst proximoLunes = new Date(Date.now() + ((8 - new Date().getDay()) % 7 || 7) * 24 * 3600 * 1000);\nconst fechaFormateada = proximoLunes.toISOString().split('T').at(0);\n\nreturn [{\n  json: {\n    id_tutoria: idTutoria,\n    id_estudiante: body.id_estudiante,\n    id_tutor: body.id_tutor,\n    materia: body.materia,\n    fecha: fechaFormateada,\n    hora_inicio: body.hora_inicio,\n    hora_fin: body.hora_fin,\n    id_disponibilidad: body.id_disponibilidad\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        208
+      ],
+      "id": "fbc55600-4c28-4230-b917-ba2456b1db9e",
+      "name": "Procesar Registro Form"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 386476655,
+          "mode": "list",
+          "cachedResultName": "tutorias",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=386476655"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id_tutoria": "={{ $json.id_tutoria }}",
+            "id_estudiante": "={{ $json.id_estudiante }}",
+            "id_tutor": "={{ $json.id_tutor }}",
+            "materia": "={{ $json.materia }}",
+            "fecha": "={{ $json.fecha }}",
+            "hora_inicio": "={{ $json.hora_inicio }}",
+            "hora_fin": "={{ $json.hora_fin }}",
+            "estado": "Asignada",
+            "url_de_conexion": "link_here"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id_tutoria",
+              "displayName": "id_tutoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "id_estudiante",
+              "displayName": "id_estudiante",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "id_tutor",
+              "displayName": "id_tutor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "materia",
+              "displayName": "materia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "hora_inicio",
+              "displayName": "hora_inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "hora_fin",
+              "displayName": "hora_fin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url_de_conexion",
+              "displayName": "url_de_conexion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        400,
+        208
+      ],
+      "id": "b1dfa80f-f8fa-461f-a1e0-058f09e8e0e2",
+      "name": "guardar tutoria",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 285599454,
+          "mode": "list",
+          "cachedResultName": "disponibilidad",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=285599454"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id_disponibilidad": "={{ $('Procesar Registro Form').item.json.id_disponibilidad }}",
+            "estado": "OCUPADO"
+          },
+          "matchingColumns": [
+            "id_disponibilidad"
+          ],
+          "schema": [
+            {
+              "id": "id_disponibilidad",
+              "displayName": "id_disponibilidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id_tutor",
+              "displayName": "id_tutor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "dia_semana",
+              "displayName": "dia_semana",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "hora_inicio",
+              "displayName": "hora_inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "hora_fin",
+              "displayName": "hora_fin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        208
+      ],
+      "id": "a3f3454b-b270-4e71-a5ab-1b4046e6e1e3",
+      "name": "actuarlizar horario",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1767426209,
+          "mode": "list",
+          "cachedResultName": "secciones",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=1767426209"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "usuario_telegram": "={{ $('Procesar Registro Form').item.json.id_estudiante }}",
+            "pantalla_actual": "reinicio",
+            "paso_actual": "\"\"",
+            "datos_parciales": "\"\""
+          },
+          "matchingColumns": [
+            "usuario_telegram"
+          ],
+          "schema": [
+            {
+              "id": "usuario_telegram",
+              "displayName": "usuario_telegram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "pantalla_actual",
+              "displayName": "pantalla_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "paso_actual",
+              "displayName": "paso_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "datos_parciales",
+              "displayName": "datos_parciales",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        848,
+        208
+      ],
+      "id": "bc18b90b-51a6-4e1b-9914-89fc9bdf8eb7",
+      "name": "reiniciar seccion",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Procesar Registro Form').item.json.id_estudiante }}",
+        "text": "=🎉 *¡Tutoría agendada con éxito desde el Formulario Web!* 🎉\n\n📚 *Materia:* {{ $('Procesar Registro Form').item.json.materia }} \n📅 *Fecha:* {{ $('Procesar Registro Form').item.json.fecha }}\n⏰ *Horario:* {{ $('Procesar Registro Form').item.json.hora_inicio }} - {{ $('Procesar Registro Form').item.json.hora_fin }} \n📌 *Código:* `{{ $('Procesar Registro Form').item.json.id_tutoria }}` \n🔗 *Aula Virtual:* link_here\n\n\nEscribe cuando quieras, será un gusto volverte a atender.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1072,
+        208
+      ],
+      "id": "feee7cc2-1338-43f3-af01-59094ea3846b",
+      "name": "Send a text message",
+      "webhookId": "0a135fbb-86d8-45d6-9503-918772447995",
+      "credentials": {
+        "telegramApi": {
+          "id": "2Fyqyxu7Bxb6E0DW",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "redirect",
+        "redirectURL": "https://t.me/exneider_bot",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1296,
+        208
+      ],
+      "id": "66b6dc82-bd5e-4946-a5be-efe13c591309",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Leer Tutores Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer Tutores Form": {
+      "main": [
+        [
+          {
+            "node": "Leer Disponibilidad Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer Disponibilidad Form": {
+      "main": [
+        [
+          {
+            "node": "Generar HTML Dinámico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar HTML Dinámico": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Procesar Registro Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procesar Registro Form": {
+      "main": [
+        [
+          {
+            "node": "guardar tutoria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "guardar tutoria": {
+      "main": [
+        [
+          {
+            "node": "actuarlizar horario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "actuarlizar horario": {
+      "main": [
+        [
+          {
+            "node": "reiniciar seccion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reiniciar seccion": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "fe5z25IdysYkwF2R",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "5065bd25-9d13-4308-956c-affa14832814",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6fcfdf5ede3d3e02de551675bbb314bed1edccb2ee146222cbfaf7e8945a954f"
+  },
+  "nodeGroups": [],
+  "id": "0Gg7bPRqDpJM5jjs",
+  "tags": []
+}

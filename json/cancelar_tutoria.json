@@ -259,7 +259,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1696,
+        2336,
         448
       ],
       "id": "7805340b-884e-483a-a807-719550f29cad",
@@ -346,8 +346,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1888,
-        416
+        2528,
+        448
       ],
       "id": "ee759d58-4660-44b2-ac53-9179c760d79b",
       "name": "Append or update row in sheet",
@@ -367,8 +367,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        2080,
-        432
+        2704,
+        448
       ],
       "id": "232ef8f7-b8e9-4b9e-8d5a-2fbd8f6b02a0",
       "name": "Send a text message1",
@@ -761,7 +761,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// 1. Capturamos los datos\nconst tutorias = $input.all();\nconst triggerData = $(\"When Executed by Another Workflow\").first().json;\nconst codigoIngresado = triggerData.Texto.toUpperCase().trim();\nconst idUsuario = triggerData.id_usuario;\n\n// 2. Filtramos únicamente las tutorías activas asignadas a este estudiante\nconst activas = tutorias.filter(t => \n  t.json.id_estudiante && t.json.id_estudiante.toString() === idUsuario.toString() && t.json.estado === \"Asignada\"\n);\n\n// 3. Comprobamos si el código escrito por el usuario existe en sus tutorías activas\nconst existeCodigo = activas.some(t => t.json.id_tutoria && t.json.id_tutoria.toUpperCase().trim() === codigoIngresado);\n\n// 4. Retornamos el resultado de la validación\nreturn [{\n  json: {\n    id_usuario: idUsuario,\n    codigo_ingresado: codigoIngresado,\n    es_valido: existeCodigo\n  }\n}];"
+        "jsCode": "// 1. Capturamos los datos\nconst tutorias = $input.all();\nconst triggerData = $(\"When Executed by Another Workflow\").first().json;\nconst codigoIngresado = triggerData.Texto.toUpperCase().trim();\nconst idUsuario = triggerData.id_usuario;\n\n// 2. Filtramos únicamente las tutorías activas asignadas a este estudiante\nconst activas = tutorias.filter(t => \n  t.json.id_estudiante && t.json.id_estudiante.toString() === idUsuario.toString() && t.json.estado === \"Asignada\"\n);\n\n// 3. Buscamos la tutoría específica que coincide con el código ingresado\nconst tutoriaEncontrada = activas.find(t => t.json.id_tutoria && t.json.id_tutoria.toUpperCase().trim() === codigoIngresado);\n\n// 4. Retornamos la validación y los metadatos de la tutoría para liberar la disponibilidad\nreturn [{\n  json: {\n    id_usuario: idUsuario,\n    codigo_ingresado: codigoIngresado,\n    es_valido: !!tutoriaEncontrada,\n    // Pasamos los parámetros clave si la tutoría existe\n    id_tutor: tutoriaEncontrada ? tutoriaEncontrada.json.id_tutor : null,\n    hora_inicio: tutoriaEncontrada ? tutoriaEncontrada.json.hora_inicio : null,\n    hora_fin: tutoriaEncontrada ? tutoriaEncontrada.json.hora_fin : null\n  }\n}];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -825,6 +825,178 @@
         "telegramApi": {
           "id": "2Fyqyxu7Bxb6E0DW",
           "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 285599454,
+          "mode": "list",
+          "cachedResultName": "disponibilidad",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=285599454"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "estado",
+              "lookupValue": "OCUPADO"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1664,
+        448
+      ],
+      "id": "c8e1d538-3382-459a-be7b-0fcf282dc2f2",
+      "name": "Leer Disponibilidades a Liberar",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const disponibilidades = $input.all();\n// Extraemos la información de la tutoría validada previamente\nconst tutoriaData = $(\"Validar Código Ingresado\").first().json;\n\n// Buscamos el bloque en disponibilidad que coincida con el tutor y horario de la tutoría cancelada\nconst bloqueCorrecto = disponibilidades.find(d => \n  d.json.id_tutor.toString() === tutoriaData.id_tutor.toString() &&\n  d.json.hora_inicio === tutoriaData.hora_inicio &&\n  d.json.hora_fin === tutoriaData.hora_fin &&\n  d.json.estado === \"OCUPADO\"\n);\n\nreturn [{\n  json: {\n    id_usuario: tutoriaData.id_usuario,\n    codigo_ingresado: tutoriaData.codigo_ingresado,\n    id_disponibilidad: bloqueCorrecto ? bloqueCorrecto.json.id_disponibilidad : null\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1888,
+        448
+      ],
+      "id": "7fcfd9d5-93f5-4703-bdfc-db60424a3be3",
+      "name": "Identificar Bloque de Horario"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE",
+          "mode": "list",
+          "cachedResultName": "TutorBot_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 285599454,
+          "mode": "list",
+          "cachedResultName": "disponibilidad",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbT4dwdOO3NaEmIXSQr5zSATfRVcMRbENJRz2PyWZhE/edit#gid=285599454"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id_disponibilidad": "={{ $json.id_disponibilidad }}",
+            "estado": "LIBRE"
+          },
+          "matchingColumns": [
+            "id_disponibilidad"
+          ],
+          "schema": [
+            {
+              "id": "id_disponibilidad",
+              "displayName": "id_disponibilidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id_tutor",
+              "displayName": "id_tutor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "dia_semana",
+              "displayName": "dia_semana",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "hora_inicio",
+              "displayName": "hora_inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "hora_fin",
+              "displayName": "hora_fin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2112,
+        448
+      ],
+      "id": "5a6dfdb3-5297-47ca-af41-7200687ef869",
+      "name": "Liberar Horario Agenda",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "qJpXBFx8Rn1PgSYQ",
+          "name": "Google Sheets account"
         }
       }
     }
@@ -999,7 +1171,7 @@
       "main": [
         [
           {
-            "node": "Update row in sheet",
+            "node": "Leer Disponibilidades a Liberar",
             "type": "main",
             "index": 0
           }
@@ -1007,6 +1179,39 @@
         [
           {
             "node": "Notificar Código Inválido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer Disponibilidades a Liberar": {
+      "main": [
+        [
+          {
+            "node": "Identificar Bloque de Horario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identificar Bloque de Horario": {
+      "main": [
+        [
+          {
+            "node": "Liberar Horario Agenda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Liberar Horario Agenda": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
             "type": "main",
             "index": 0
           }
@@ -1023,7 +1228,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "748cf351-958c-4130-8570-77227e6c94f1",
+  "versionId": "bd64a01b-3478-4505-95f9-be1c003bea74",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "6fcfdf5ede3d3e02de551675bbb314bed1edccb2ee146222cbfaf7e8945a954f"
